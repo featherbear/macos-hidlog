@@ -1,3 +1,4 @@
+To get foreground events
 
 subsystem == "com.apple.processmanager" AND eventMessage BEGINSWITH "SETFRONT: pid="
 subsystem == "com.apple.launchservices" AND category == "cas" AND eventMessage CONTAINS "ApplicationType\"=\"Foreground\"" (with --info)
