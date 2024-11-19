@@ -60,6 +60,7 @@ fn callback(eventTap: c.CGEventTapProxy, eventType: c.CGEventType, event: c.CGEv
             modifierFlags.function = (flags & c.kCGEventFlagMaskSecondaryFn) != 0;
             std.debug.print("DBG: Key modifiers {}\n", .{modifierFlags});
         },
+
         else => {
             std.debug.print("DBG: unknown event {}\n", .{eventType});
         },
@@ -68,18 +69,12 @@ fn callback(eventTap: c.CGEventTapProxy, eventType: c.CGEventType, event: c.CGEv
     return event;
 }
 
-fn aaa() void {
-    // func getFrontmostApplication() -> NSRunningApplication? {
-    //     return NSWorkspace.shared.frontmostApplication
-    // }
-
-}
-
 pub fn main() void {
     // https://developer.apple.com/documentation/coregraphics/cgeventtype
     const event =
         // Mouse Events
         c.CGEventMaskBit(c.kCGEventMouseMoved) | c.CGEventMaskBit(c.kCGEventLeftMouseDown) | c.CGEventMaskBit(c.kCGEventRightMouseDown) |
+
         // Keyboard Events
         c.CGEventMaskBit(c.kCGEventKeyDown) | c.CGEventMaskBit(c.kCGEventFlagsChanged);
 
