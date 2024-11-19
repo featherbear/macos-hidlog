@@ -2,11 +2,16 @@ const std = @import("std");
 
 const c = @cImport({
     @cInclude("CoreGraphics/CoreGraphics.h");
+    @cInclude("Carbon/Carbon.h");
     @cInclude("os/log.h");
 });
 
+const keyboard = @import("keyboard.zig");
+
 var lastX: f64 = undefined;
 var lastY: f64 = undefined;
+
+var modifierFlags = keyboard.ModifierFlags{ .shift = false, .control = false, .option = false, .command = false, .caps = false, .function = false };
 
 fn callback(eventTap: c.CGEventTapProxy, eventType: c.CGEventType, event: c.CGEventRef, userInfo: ?*anyopaque) callconv(.C) c.CGEventRef {
     _ = eventTap;
@@ -41,13 +46,20 @@ fn callback(eventTap: c.CGEventTapProxy, eventType: c.CGEventType, event: c.CGEv
         },
 
         c.kCGEventKeyDown => {
-            // std.debug.print("DBG: keyDown {}\n", .{c.CGEventGetIntegerValueField(event, c.kCGKeyboardEventKeycode)});
+            const keycode = c.CGEventGetIntegerValueField(event, c.kCGKeyboardEventKeycode);
+            std.debug.print("DBG: Key press {s}\n", .{keyboard.virtKeyCodeToKeyboard(keycode, modifierFlags)});
         },
 
         c.kCGEventFlagsChanged => {
-            // std.debug.print("DBG: flags {}\n", .{c.CGEventGetFlags(event)});
+            const flags = c.CGEventGetFlags(event);
+            modifierFlags.shift = (flags & c.kCGEventFlagMaskShift) != 0;
+            modifierFlags.control = (flags & c.kCGEventFlagMaskControl) != 0;
+            modifierFlags.option = (flags & c.kCGEventFlagMaskAlternate) != 0;
+            modifierFlags.command = (flags & c.kCGEventFlagMaskCommand) != 0;
+            modifierFlags.caps = (flags & c.kCGEventFlagMaskAlphaShift) != 0;
+            modifierFlags.function = (flags & c.kCGEventFlagMaskSecondaryFn) != 0;
+            std.debug.print("DBG: Key modifiers {}\n", .{modifierFlags});
         },
-
         else => {
             std.debug.print("DBG: unknown event {}\n", .{eventType});
         },
